@@ -81,9 +81,9 @@ namespace KenshiMultiplayer.Game
             Logger.Log(LOG_PREFIX + "Save system initialized");
         }
 
-        private void OnWorldLoaded(WorldSave worldSave)
+        private void OnWorldLoaded(WorldSaveData worldSaveData)
         {
-            Logger.Log(LOG_PREFIX + $"World loaded: {worldSave.WorldId} (v{worldSave.SaveVersion})");
+            Logger.Log(LOG_PREFIX + $"World loaded: {worldSaveData.WorldId} (v{worldSaveData.SaveVersion})");
         }
 
         private void OnLoadError(string error)

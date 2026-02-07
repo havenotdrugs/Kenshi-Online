@@ -185,6 +185,11 @@ namespace KenshiOnline.Coordinates
             return buffer;
         }
 
+        public static TransformPayload Deserialize(byte[] data)
+        {
+            return Deserialize(data.AsSpan());
+        }
+
         public static TransformPayload Deserialize(ReadOnlySpan<byte> data)
         {
             var payload = new TransformPayload();
@@ -240,6 +245,11 @@ namespace KenshiOnline.Coordinates
             return JsonSerializer.SerializeToUtf8Bytes(this);
         }
 
+        public static HealthPayload Deserialize(byte[] data)
+        {
+            return Deserialize(data.AsSpan());
+        }
+
         public static HealthPayload Deserialize(ReadOnlySpan<byte> data)
         {
             return JsonSerializer.Deserialize<HealthPayload>(data) ?? new HealthPayload();
@@ -266,6 +276,11 @@ namespace KenshiOnline.Coordinates
         public override byte[] Serialize()
         {
             return JsonSerializer.SerializeToUtf8Bytes(this);
+        }
+
+        public static CombatActionPayload Deserialize(byte[] data)
+        {
+            return Deserialize(data.AsSpan());
         }
 
         public static CombatActionPayload Deserialize(ReadOnlySpan<byte> data)
@@ -410,7 +425,7 @@ namespace KenshiOnline.Coordinates
     /// </summary>
     public static class SchemaRegistry
     {
-        private static readonly ConcurrentDictionary<SchemaId, Func<ReadOnlySpan<byte>, SchemaPayload>> _deserializers = new();
+        private static readonly ConcurrentDictionary<SchemaId, Func<byte[], SchemaPayload>> _deserializers = new();
 
         static SchemaRegistry()
         {
@@ -420,12 +435,12 @@ namespace KenshiOnline.Coordinates
             Register(new SchemaId(SchemaKind.CombatAction, 1), data => CombatActionPayload.Deserialize(data));
         }
 
-        public static void Register(SchemaId schemaId, Func<ReadOnlySpan<byte>, SchemaPayload> deserializer)
+        public static void Register(SchemaId schemaId, Func<byte[], SchemaPayload> deserializer)
         {
             _deserializers[schemaId] = deserializer;
         }
 
-        public static SchemaPayload? Deserialize(SchemaId schemaId, ReadOnlySpan<byte> data)
+        public static SchemaPayload? Deserialize(SchemaId schemaId, byte[] data)
         {
             if (_deserializers.TryGetValue(schemaId, out var deserializer))
                 return deserializer(data);
