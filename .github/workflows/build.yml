@@ -1,0 +1,43 @@
+name: Build Kenshi Online
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8.0
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build C# Application
+      run: dotnet build --configuration Release
+
+    - name: Build C++ DLL
+      working-directory: ./KenshiOnlineMod
+      run: |
+        mkdir build
+        cd build
+        cmake .. -G "Visual Studio 17 2022" -A x64
+        cmake --build . --config Release
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: kenshi-online-build
+        path: |
+          Kenshi-Online/bin/Release/net8.0/
+          KenshiOnlineMod/build/bin/Release/
+        retention-days: 7
